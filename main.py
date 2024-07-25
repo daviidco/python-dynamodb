@@ -1,6 +1,6 @@
 import boto3
 
-# Configura el cliente de DynamoDB para apuntar al endpoint local
+# Setting the DynamoDB client to point to the local endpoint
 dynamodb = boto3.resource(
     'dynamodb',
     endpoint_url="http://localhost:8000",
@@ -9,14 +9,17 @@ dynamodb = boto3.resource(
     region_name="us-west-2"
 )
 
-# Crear una tabla en DynamoDB Local
+
 def create_table():
+    """
+    Create a DynamoDB with a partition key 'id'.
+    """
     table = dynamodb.create_table(
         TableName='DemoTable',
         KeySchema=[
             {
                 'AttributeName': 'id',
-                'KeyType': 'HASH'  # Clave primaria
+                'KeyType': 'HASH'
             }
         ],
         AttributeDefinitions=[
@@ -31,15 +34,26 @@ def create_table():
         }
     )
     table.wait_until_exists()
-    print(f"Tabla creada: {table.table_name}")
+    print(f"Created table: {table.table_name}")
 
-# Lista las tablas existentes
+
 def list_tables():
-    tables = list(dynamodb.tables.all())
-    print("Tablas en DynamoDB Local:", tables)
+    """
+    List all tables in the local DynamoDB instance.
 
-# Añadir un ítem a la tabla
+    Prints the names of all tables available in the local DynamoDB.
+    """
+    tables = list(dynamodb.tables.all())
+    print("Tables at Local DynamoDB:", tables)
+
+
 def add_item():
+    """
+    Add an item to the 'DemoTable' in DynamoDB.
+
+    The item added has an 'id' of '1', a 'name' of 'John Doe', and an 'age' of 30.
+    Prints a confirmation message after adding the item.
+    """
     table = dynamodb.Table('DemoTable')
     table.put_item(
         Item={
@@ -48,14 +62,23 @@ def add_item():
             'age': 30
         }
     )
-    print("Ítem añadido a la tabla.")
+    print("Item added to table")
 
-# Eliminar una tabla
+
 def delete_table(table_name: str):
+    """
+    Delete a DynamoDB table by name.
+
+    Args:
+        table_name (str): The name of the table to delete.
+
+    Waits until the table no longer exists before printing a confirmation message.
+    """
     table = dynamodb.Table(table_name)
     table.delete()
     table.wait_until_not_exists()
-    print(f"Tabla eliminada: {table.table_name}")
+    print(f"Deleted table: {table.table_name}")
+
 
 if __name__ == "__main__":
     create_table()
